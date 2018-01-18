@@ -1,0 +1,22 @@
+{
+  "name": "clay",
+  "version": "1.0.0",
+  "description": "vue custom component framework",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhou-yg/clay.git"
+  },
+  "author": "",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/zhou-yg/clay/issues"
+  },
+  "homepage": "https://github.com/zhou-yg/clay#readme",
+  "dependencies": {
+    "lodash": "^4.17.4"
+  }
+}
