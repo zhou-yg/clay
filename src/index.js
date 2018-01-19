@@ -6,9 +6,17 @@ export default {
   install (Vue) {
     Vue.component('clay-proxy', Proxy);
   },
-  config (map) {
-    Object.keys(map).forEach(k => {
-      m.set(k, map[k]);
+  config ({schema, storage}) {
+    m.setStorage(storage);
+
+    Object.keys(schema).forEach(k => {
+      var value = schema[k];
+      if (!value.type) {
+        value = {
+          type: value,
+        }
+      }
+      storage.setData(k, value);
     });
   }
 }
