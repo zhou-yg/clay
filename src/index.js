@@ -1,4 +1,4 @@
-import Proxy from './components/proxy.vue';
+import Proxy from './components/Proxy.vue';
 
 import m from './m';
 
@@ -11,11 +11,6 @@ export default {
 
     Object.keys(schema).forEach(k => {
       var value = schema[k];
-      if (!value.type) {
-        value = {
-          type: value,
-        }
-      }
       storage.setData(k, value);
     });
   }
