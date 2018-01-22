@@ -1,17 +1,20 @@
 import Proxy from './components/Proxy.vue';
+import generateStoreState from './generateStoreState';
+import config from './config';
 
-import m from './m';
+var isConfiged = false;
 
 export default {
   install (Vue) {
     Vue.component('clay-proxy', Proxy);
   },
   config ({schema, storage}) {
-    m.setStorage(storage);
+    config.setStorage(storage);
+    config.setSchema(schema);
 
-    Object.keys(schema).forEach(k => {
-      var value = schema[k];
-      storage.setData(k, value);
-    });
-  }
+    isConfiged = true;
+  },
+  clayState () {
+    return generateStoreState();
+  },
 }
