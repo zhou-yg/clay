@@ -1,5 +1,5 @@
 import Proxy from './components/Proxy.vue';
-import generateStoreState from './generateStoreState';
+import generateVuexModule from './generateVuexModule';
 import config from './config';
 
 var isConfiged = false;
@@ -15,6 +15,6 @@ export default {
     isConfiged = true;
   },
   clayState () {
-    return generateStoreState();
+    return generateVuexModule();
   },
 }

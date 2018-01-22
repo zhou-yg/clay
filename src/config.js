@@ -60,7 +60,7 @@ export default {
     }
     schema = s;
   },
-  getSchama (type) {
+  getSchema (type) {
     return JSON.parse(JSON.stringify(schema[type]));
   },
 };
