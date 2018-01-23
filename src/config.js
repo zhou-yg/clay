@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import {cloneDeep, isPlainObject, isArray} from 'lodash';
-import { reduceObj } from './utils';
+import { reduceObj, typeDefaultValueMap } from './utils';
 var storage = null;
 var schema = null;
 var vm = null;
@@ -26,7 +26,7 @@ function nomalizeSchema (schema) {
       var keyOne = v[key];
       if (!isPlainObject(keyOne)) {
         keyOne = {
-          name: keyOne,
+          name: key,
           type: keyOne
         }
       }
@@ -83,14 +83,25 @@ export default {
   },
   getStorage () {
     return {
-      setData (k, v) {
-        vm[k] = v;
+      setData (type, v) {
+        vm[type] = v;
+      },
+      newData (type) {
+        const dataTemp = cloneDeep(schema[type][0]);
+
+        const newData = reduceObj(Object.values(dataTemp).map(vObj => {
+          return {
+            [vObj.key]: typeDefaultValueMap(vObj.type),
+          }
+        }));
+
+        vm[type] = vm[type].concat(newData);
+      },
+      getData (type) {
+        return vm[type];
       },
       save () {
         vmChangedCb(vm.$data);
-      },
-      getData (k) {
-        return vm[k];
       },
     }
   },
