@@ -10,13 +10,20 @@ const Cpt = Vue.extend({
   mixins: [props2DataMixin('group', 'myGroup')],
   props: {
     group: Array,
+    x: Number,
+    y: Number,
   },
   data () {
     return {
     };
   },
   computed: {
-
+    position () {
+      return {
+        top: this.y + 'px',
+        left: this.x + 'px',
+      }
+    },
   },
   mounted () {
     this.$nextTick(() => {
@@ -45,11 +52,11 @@ export default Cpt;
 </script>
 
 <template lang="html">
-  <div class="clay-operation">
+  <div class="clay-operation" :style="position">
     <p v-for="(g, index) in group" :key="g.name" :data-index="index" v-if="g.type === 'input'" >
       {{g.name}}：
       <span class="input-box">
-        <el-input :value="g.value" @input="v => changeValue(index, v)" />
+        <el-input :value="g.value" size="small" @input="v => changeValue(index, v)" />
       </span>
     </p>
     <p class="btns">
@@ -67,24 +74,30 @@ export default Cpt;
   padding: 5px;
   position: absolute;
   background: #fff;
-  transform: translate(0, 10px);
+  transform: translate(20px, 0px);
   width: 180px;
   z-index: 1999;
+  left: 100%;
+  top: 0;
+
+  > p {
+    margin: 0 0 8px 0;
+  }
 
   &:before,
   &:after {
     content: '';
     border: 5px solid;
-    border-color: transparent transparent #999 transparent;
+    border-color: transparent  #999 transparent transparent;
     position: absolute;
-    top: -10px;
-    left: 6px;
+    left: -10px;
+    top: 6px;
   }
   &:after{
     border: 4px solid;
-    border-color: transparent transparent #fff transparent;
-    top: -8px;
-    left: 7px;
+    border-color: transparent  #fff transparent transparent;
+    left: -8px;
+    top: 7px;
   }
   .input-box {
     width: 100px;

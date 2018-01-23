@@ -7,19 +7,7 @@ import props2DataMixin from '../mixins/props2DataMixin';
 import config from '../config';
 import merge from 'lodash/merge';
 import Operation from './Operation.vue';
-
-function trans (obj, pre) {
-  const d = Object.keys(obj).map(k => {
-    return {
-      [k]: {
-        [pre]: obj[k],
-      },
-    };
-  }).reduce((pre, next) => {
-    return Object.assign(pre, next);
-  }, {});
-  return d;
-}
+import { reduceObj,trans} from '../utils';
 
 const Cpt = Vue.extend({
   // mixins: [props2DataMixin('data', 'myData')],
@@ -34,14 +22,12 @@ const Cpt = Vue.extend({
       return config.getStorage().getData(this.type);
     },
     mySchema () {
-      return config.getSchama(this.type);
+      return config.getSchema(this.type);
     },
     myGroup () {
-      const final = merge({}, trans(this.myData, 'value'), trans(this.mySchema, 'type'));
+      const final = merge({}, trans(this.myData, 'value'), this.mySchema);
       const d = Object.keys(final).map(k => {
-        return Object.assign({
-          name: k,
-        },final[k])
+        return final[k];
       });
       console.log(`d:`, d);
       return d;
@@ -58,7 +44,10 @@ const Cpt = Vue.extend({
       this.op.$destroy();
       this.op = null;
     },
-    showOp () {
+    showOp (e) {
+      var pageX = e.pageX - e.offsetX;
+      var pageY = e.pageY - e.offsetY;
+
       if (this.op) {
         return this.removeOp();
       }
@@ -66,23 +55,27 @@ const Cpt = Vue.extend({
         el: document.createElement('div'),
         propsData: {
           group: this.myGroup,
+          x: pageX,
+          y: pageY,
         }
       });
       op.$on('change', group => {
-        group.forEach(obj => {
-          config.getStorage().setData(this.type, {
-            [obj.name]: obj.value,
-          });
-        })
+        const typeValue = reduceObj(group.map(obj => {
+          return {
+            [obj.key]: obj.value
+          }
+        }))
+        config.getStorage().setData(this.type, typeValue);
       });
       op.$on('save', () => {
         config.getStorage().save();
+        this.removeOp();
       });
       op.$on('cancel', () => {
         this.removeOp();
       });
       window.pEl = this.$el;
-      this.$el.appendChild(op.$el);
+      document.body.appendChild(op.$el);
       this.op = op;
     },
   },
@@ -103,16 +96,18 @@ export default Cpt;
 </template>
 <style lang="">
  .clay-proxy {
-   /*display: inline-block;*/
+   width: 100%;
+   display: inline-block;
    position: relative;
 
    .tag {
      content: '';
      border: solid 8px;
-     border-color: transparent transparent #666  #666;
+     border-color: #666  #666 transparent transparent ;
      position: absolute;
-     top: -16px;
-     left: 0;
+     top: 0px;
+     right: 0;
+     cursor: pointer;
    }
  }
 </style>
