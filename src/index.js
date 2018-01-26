@@ -7,6 +7,9 @@ var isConfiged = false;
 export default {
   install (Vue) {
     Vue.component('clay-proxy', Proxy);
+    Vue.filter('asArr', function (obj) {
+      return Object.values(obj);
+    });
   },
   config ({schema, storage}) {
     config.setStorage(storage);

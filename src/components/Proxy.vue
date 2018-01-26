@@ -5,9 +5,21 @@
 import Vue from 'vue';
 import props2DataMixin from '../mixins/props2DataMixin';
 import config from '../config';
-import {merge, cloneDeep} from 'lodash';
+import {merge, cloneDeep, pick} from 'lodash';
 import Operation from './Operation.vue';
-import { reduceObj,trans, groupToValue} from '../utils';
+import { reduceObj,trans, groupToValue, getXY} from '../utils';
+
+const opManager = {
+  op: null,
+  target: null,
+  removeOp() {
+    if (this.op && this.op.$destroy) {
+      this.op.$el.remove();
+      this.op.$destroy();
+      this.op = null;
+    }
+  },
+}
 
 const Cpt = Vue.extend({
   // mixins: [props2DataMixin('data', 'myData')],
@@ -30,15 +42,15 @@ const Cpt = Vue.extend({
           throw new Error(`${this.type} not match array`);
         }
 
+        const myPickedData = pick(this.myData, Object.keys(this.mySchema[0]));
+
         let schemaArr = new Array(this.myData.length).fill(this.mySchema[0]).map(cloneDeep);
-        let final = merge([], trans(this.myData, 'value'), schemaArr);
+        let final = merge([], trans(myPickedData, 'value'), schemaArr);
         final = final.map(obj => Object.values(obj));
-        console.log(`final:`, final);
         return final;
       } else {
         let final = merge({}, trans(this.myData, 'value'), this.mySchema);
         let d = Object.values(final);
-        console.log(`d:`, d);
         return d;
       }
     },
@@ -49,28 +61,28 @@ const Cpt = Vue.extend({
     });
   },
   methods: {
-    removeOp () {
-      this.op.$el.remove();
-      this.op.$destroy();
-      this.op = null;
-    },
-    showOp (e, pageX, pageY) {
-      if (pageX && pageY) {
+    showOp (e, position) {
 
+      if (opManager.op && !this.isShowedOp) {
+        opManager.removeOp();
+      }
+      if (this.isShowedOp) {
+        opManager.removeOp();
+        return this.isShowedOp = false;
+      }
+
+
+      if (position) {
       } else {
-        pageX = e.pageX - e.offsetX - e.currentTarget.offsetLeft;
-        pageY = e.pageY - e.offsetY + e.currentTarget.parentNode.offsetHeight;
+        position = getXY(e);
       }
 
-      if (this.op) {
-        return this.removeOp();
-      }
       const op = new Operation({
         el: document.createElement('div'),
         propsData: {
+          title: this.type,
           group: this.myGroup,
-          x: pageX,
-          y: pageY,
+          position,
         }
       });
       op.$on('change', group => {
@@ -84,21 +96,22 @@ const Cpt = Vue.extend({
       });
       op.$on('save', () => {
         config.getStorage().save();
-        this.removeOp();
+        opManager.removeOp();
       });
       op.$on('newOne', () => {
         config.getStorage().newData(this.type);
-        this.removeOp();
+        opManager.removeOp();
         this.$nextTick(() => {
-          this.showOp(null, pageX, pageY);
+          this.showOp(null, position);
         })
       });
       op.$on('cancel', () => {
-        this.removeOp();
+        opManager.removeOp();
       });
       window.pEl = this.$el;
       document.body.appendChild(op.$el);
-      this.op = op;
+      opManager.op = op;
+      this.isShowedOp = true;
     },
   },
   components: {

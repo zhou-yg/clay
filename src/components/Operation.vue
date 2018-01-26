@@ -5,13 +5,14 @@
 import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
 import props2DataMixin from '../mixins/props2DataMixin';
+import OperationItem from './OperationItem.vue';
 
 const Cpt = Vue.extend({
   mixins: [props2DataMixin('group', 'myGroup')],
   props: {
+    title: String,
     group: Array,
-    x: Number,
-    y: Number,
+    position: Object,
   },
   data () {
     return {
@@ -21,10 +22,12 @@ const Cpt = Vue.extend({
     isArr () {
       return Array.isArray(this.group[0]);
     },
-    position () {
-      return {
-        top: this.y + 'px',
-        left: this.x + 'px',
+    positionDirection () {
+      switch (this.position.direction) {
+        case 'right':
+          return 'right';
+        default:
+          return 'left';
       }
     },
   },
@@ -55,6 +58,7 @@ const Cpt = Vue.extend({
     },
   },
   components: {
+    OperationItem,
   },
 });
 
@@ -62,26 +66,21 @@ export default Cpt;
 </script>
 
 <template lang="html">
-  <div class="clay-operation bottom" :style="position">
-    <div class="item" v-for="(g, index) in group" :key="g.name" :data-index="index" >
-        <p v-if="isArr" >
-          <span v-for="(g1, index2) in g">
-            <p class="line" v-if="g1.type === 'input'" >
-              <span class="pre">{{g1.name}}：</span>
-              <span class="input-box">
-                <el-input :value="g1.value" size="small" @input="v => changeValue(v, index, index2)" />
-              </span>
-            </p>
-          </span>
-        </p>
-        <p v-else>
-          <p class="line" v-if="g.type === 'input'" >
-            <span class="pre">{{g.name}}：</span>
-            <span class="input-box">
-              <el-input :value="g.value" size="small" @input="v => changeValue(v, index)" />
+  <div class="clay-operation-box">
+    <div class="clay-operation" :class="positionDirection" >
+      <header>
+        <h3>{{title}}</h3>
+      </header>
+      <div class="item" v-for="(g, index) in group" :key="g.name" :data-index="index" >
+          <p v-if="isArr" >
+            <span v-for="(g1, index2) in g">
+              <operation-item :g="g1" @change="v => changeValue(v, index, index2)" />
             </span>
           </p>
-        </p>
+          <p v-else>
+            <operation-item :g="g" @change="v => changeValue(v, index)" />
+          </p>
+      </div>
     </div>
     <p class="btns">
       <span class="fl" v-if="isArr">
@@ -98,71 +97,67 @@ export default Cpt;
 </template>
 
 <style lang="">
+.clay-operation-box{
+  /*&:before {
+    content: '';
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1999
+  }*/
+}
 .clay-operation{
   border: 1px solid #eee;
   box-shadow: 0 2px 4px 0 rgba(0,0,0,.12), 0 0 6px 0 rgba(0,0,0,0.04);
   color: #666;
   padding: 5px;
-  position: absolute;
   background: #fff;
-  transform: translate(20px, 0px);
-  width: 240px;
+  width: 300px;
+  position: fixed;
   z-index: 1999;
-  left: 100%;
   top: 0;
+  left: 0;
+  bottom: 0;
+  overflow: auto;
+  padding-bottom: 40px;
+
+  header {
+    margin-bottom: 10px;
+    color: #333;
+  }
 
   .item {
     margin: 0 0 8px 0;
     padding-bottom: 5px;
     border-bottom: 1px solid #eee;
-
-    .pre {
-      width: 4em;
-      display: inline-block;
-    }
-    .line {
-      margin: 0 0 8px 0;
-    }
   }
 
-  &:before,
-  &:after {
-    content: '';
-    border: 5px solid;
-    border-color: transparent  #999 transparent transparent;
-    position: absolute;
-    left: -10px;
-    top: 6px;
-  }
-  &:after{
-    border: 4px solid;
-    border-color: transparent  #fff transparent transparent;
-    left: -8px;
-    top: 7px;
-  }
+  &.right {
+    left: auto;
+    right: 0;
 
-  &.bottom {
-    transform: translate(0px, 10px);
-    &:before,
-    &:after {
-      border-color: transparent  transparent #999  transparent;
-      position: absolute;
-      top: -10px;
-      left: 6px;
-    }
-    &:after{
-      border-color: transparent transparent  #fff  transparent;
-      top: -8px;
-      left: 7px;
+    & + .btns{
+      left: auto;
+      right: 0;
     }
   }
 
   .input-box {
-    width: 100px;
+    width: 200px;
     display: inline-block;
   }
-  .btns {
-    margin: 10px 0 0 0;
+  & + .btns {
+    background-color: #fff;
+    border-top: 1px solid #eee;
+    padding: 10px 0;
+    width: 312px;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 2300;
     .fr{
       float: right;
 

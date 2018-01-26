@@ -39,3 +39,19 @@ export function typeDefaultValueMap (t) {
   const v = m[t]
   return v === undefined ? null : v;
 }
+
+export function getXY (e) {
+  const operationWidth = 300;
+  const bodyWidth = document.body.offsetWidth;
+
+  var pageX = e.pageX - e.offsetX - e.currentTarget.offsetLeft;
+  var direction = 'left';
+
+  if (pageX < operationWidth) {
+    direction = 'right';
+  }
+
+  return {
+    direction,
+  }
+}
