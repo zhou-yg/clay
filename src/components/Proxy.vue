@@ -42,7 +42,8 @@ const Cpt = Vue.extend({
           throw new Error(`${this.type} not match array`);
         }
 
-        const myPickedData = pick(this.myData, Object.keys(this.mySchema[0]));
+        const keys = Object.keys(this.mySchema[0]);
+        const myPickedData = this.myData.map(obj => pick(obj, keys));
 
         let schemaArr = new Array(this.myData.length).fill(this.mySchema[0]).map(cloneDeep);
         let final = merge([], trans(myPickedData, 'value'), schemaArr);
