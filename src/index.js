@@ -12,8 +12,8 @@ export default {
     });
   },
   config ({schema, storage}) {
-    config.setStorage(storage);
     config.setSchema(schema);
+    config.setStorage(storage);
 
     isConfiged = true;
   },

@@ -3,7 +3,8 @@ import {cloneDeep, isPlainObject, isArray} from 'lodash';
 import { reduceObj, typeDefaultValueMap } from './utils';
 var storage = null;
 var schema = null;
-var vm = null;
+var vm = new Vue({
+});
 var vmChangedCb = () => {};
 
 function schemaValidator (schema) {
@@ -56,11 +57,23 @@ function nomalizeSchema (schema) {
   return schema;
 }
 
-
-function initVm (data) {
+function initVm (vm, schema) {
   vm = new Vue({
-    data: () => data,
+    data () {
+      return reduceObj(Object.keys(schema).map(key => {
+        return {
+          [key]: isArray(schema[key]) ? [] : {}
+        };
+      }));
+    },
   });
+  return vm;
+}
+function initVmData (vm, data) {
+  Object.keys(data).forEach(k => {
+    vm[k] = data[k];
+  });
+  return vm;
 }
 
 export default {
@@ -73,12 +86,13 @@ export default {
     }
     const initData = s.init();
     vmChangedCb = s.save;
+    vm = initVm(vm, schema);
     if (initData instanceof Promise) {
       initData.then(data => {
-        initVm (data);
+        vm = initVmData (vm, data);
       })
     } else {
-      initVm (initData);
+      vm = initVmData (vm, initData);
     }
   },
   getStorage () {
@@ -111,7 +125,7 @@ export default {
     }
     schema = nomalizeSchema(s);
 
-    console.log(schema);
+    console.log('schema:', schema);
   },
   getSchema (type) {
     if (!schema) {

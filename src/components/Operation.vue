@@ -159,11 +159,8 @@ export default Cpt;
     bottom: 0;
     z-index: 2300;
     .fr{
+      margin-right: 8px;
       float: right;
-
-      & + .fr {
-        margin-right: 8px;
-      }
     }
     .fl{
       float: left;
