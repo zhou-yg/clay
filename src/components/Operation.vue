@@ -38,12 +38,14 @@ const Cpt = Vue.extend({
   },
   methods: {
     changeValue (v, i , i2) {
-      const group = cloneDeep(this.group);
+      console.log(v, i, i2);
+      const group = cloneDeep(this.myGroup);
       if (i2 !== undefined) {
         group[i][i2].value = v;
       } else {
         group[i].value = v;
       }
+      console.log(group);
       this.myGroup = group;
       this.$emit('change', this.myGroup);
     },
@@ -71,10 +73,10 @@ export default Cpt;
       <header>
         <h3>{{title}}</h3>
       </header>
-      <div class="item" v-for="(g, index) in group" :key="g.name" :data-index="index" >
+      <div class="item" v-for="(g, index) in myGroup" :key="g.name" :data-index="index" >
           <p v-if="isArr" >
             <span v-for="(g1, index2) in g">
-              <operation-item :g="g1" @change="v => changeValue(v, index, index2)" />
+              <operation-item :key="g.value + String(index2)" :g="g1" @change="v => changeValue(v, index, index2)" />
             </span>
           </p>
           <p v-else>
