@@ -21,6 +21,16 @@ function schemaValidator (schema) {
   });
   return r;
 }
+/*
+最终转化为, 对象 or 数组
+{
+  [数据字段]: {
+    key, // 字段名
+    type, // 数据类型 input, boolean,
+    name, // 名称
+ }
+}
+*/
 function nomalizeSchema (schema) {
   function fillNameAndType (v) {
     v = reduceObj(Object.keys(v).map(key => {
