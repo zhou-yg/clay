@@ -1,6 +1,6 @@
 
-export function reduceObj (arr) {
-  return arr.reduce((pre, next) => Object.assign(pre, next), {});
+export function reduceObj (arr, obj = {}) {
+  return arr.reduce((pre, next) => Object.assign(pre, next), obj);
 }
 
 export function trans (obj, pre) {

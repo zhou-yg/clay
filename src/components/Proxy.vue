@@ -30,6 +30,10 @@ const Cpt = Vue.extend({
     return {};
   },
   computed: {
+    openProxy () {
+      console.log(`config.getStorage().getData('openProxy'):`, config.getStorage().getData('openProxy'));
+      return config.getStorage().getData('openProxy');
+    },
     myData () {
       return config.getStorage().getData(this.type);
     },
@@ -60,6 +64,10 @@ const Cpt = Vue.extend({
     this.$nextTick(() => {
       console.log(this.myGroup);
     });
+    console.log(`window.location.search.indexOf('openProxy'):`, window.location.search.indexOf('openProxy'));
+    if (window.location.search.indexOf('openProxy') !== -1) {
+      config.getStorage().setData('openProxy', true);
+    }
   },
   methods: {
     showOp (e, position) {
@@ -127,7 +135,7 @@ export default Cpt;
   <span class="clay-proxy">
     <slot v-bind="myData" />
 
-    <span class="tag" @click="showOp"></span>
+    <span v-if="openProxy" class="tag" @click="showOp"></span>
   </span>
 </template>
 <style lang="">
