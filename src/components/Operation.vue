@@ -33,10 +33,16 @@ const Cpt = Vue.extend({
   },
   mounted () {
     this.$nextTick(() => {
-
+      window.CO = this.$refs.co;
     });
   },
   methods: {
+    refreshGroupdata (newGroupData) {
+      this.myGroup = cloneDeep(newGroupData);
+      this.$nextTick(() => {
+        this.$refs.co.scrollTop = 10000;
+      });
+    },
     changeValue (v, i , i2) {
       console.log(v, i, i2);
       const group = cloneDeep(this.myGroup);
@@ -45,7 +51,6 @@ const Cpt = Vue.extend({
       } else {
         group[i].value = v;
       }
-      console.log(group);
       this.myGroup = group;
       this.$emit('change', this.myGroup);
     },
@@ -69,7 +74,8 @@ export default Cpt;
 
 <template lang="html">
   <div class="clay-operation-box">
-    <div class="clay-operation" :class="positionDirection" >
+    <div class="clay-operation-box-bg" @click="cancel"></div>
+    <div ref="co" class="clay-operation" :class="positionDirection" >
       <header>
         <h3>{{title}}</h3>
       </header>
@@ -100,24 +106,25 @@ export default Cpt;
 
 <style lang="">
 .clay-operation-box{
-  /*&:before {
+  .clay-operation-box-bg {
     content: '';
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.2);
     width: 100%;
     height: 100%;
     position: fixed;
     top: 0;
     left: 0;
     z-index: 1999
-  }*/
+  }
 }
 .clay-operation{
-  border: 1px solid #eee;
-  box-shadow: 0 2px 4px 0 rgba(0,0,0,.12), 0 0 6px 0 rgba(0,0,0,0.04);
+  border: 0;
+  box-shadow: 0 0 10px -5px rgba(0,0,0,0.2), 0 0 24px 2px rgba(0,0,0,0.14), 0 0 30px 5px rgba(0,0,0,0.12);
   color: #666;
-  padding: 5px;
+  padding: 10px;
   background: #fff;
-  width: 300px;
+  width: 50%;
+  min-width: 400px;
   position: fixed;
   z-index: 1999;
   top: 0;
@@ -148,14 +155,15 @@ export default Cpt;
   }
 
   .input-box {
-    width: 200px;
+    width: 300px;
     display: inline-block;
   }
   & + .btns {
     background-color: #fff;
     border-top: 1px solid #eee;
-    padding: 10px 0;
-    width: 312px;
+    padding: 10px 10px;
+    width: 50%;
+    min-width: 400px;
     position: absolute;
     left: 0;
     bottom: 0;

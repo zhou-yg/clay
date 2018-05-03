@@ -75,10 +75,6 @@ const Cpt = Vue.extend({
       if (opManager.op && !this.isShowedOp) {
         opManager.removeOp();
       }
-      if (this.isShowedOp) {
-        opManager.removeOp();
-        return this.isShowedOp = false;
-      }
 
 
       if (position) {
@@ -109,10 +105,12 @@ const Cpt = Vue.extend({
       });
       op.$on('newOne', () => {
         config.getStorage().newData(this.type);
-        opManager.removeOp();
-        this.$nextTick(() => {
-          this.showOp(null, position);
-        })
+        // console.log(this.myGroup);
+        op.refreshGroupdata(this.myGroup);
+        // opManager.removeOp();
+        // this.$nextTick(() => {
+        //   this.showOp(null, position);
+        // })
       });
       op.$on('cancel', () => {
         opManager.removeOp();
@@ -120,7 +118,6 @@ const Cpt = Vue.extend({
       window.pEl = this.$el;
       document.body.appendChild(op.$el);
       opManager.op = op;
-      this.isShowedOp = true;
     },
   },
   components: {

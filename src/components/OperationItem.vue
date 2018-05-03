@@ -50,6 +50,7 @@ export default Cpt;
 
   .pre {
     width: 6em;
+    text-align: right;
     display: inline-block;
   }
 
