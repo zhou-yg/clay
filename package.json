@@ -1,5 +1,5 @@
 {
-  "name": "clay",
+  "name": "vue-clay",
   "version": "1.0.1",
   "description": "vue custom component framework",
   "main": "src/index.js",
