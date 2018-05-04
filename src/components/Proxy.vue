@@ -61,13 +61,9 @@ const Cpt = Vue.extend({
     },
   },
   mounted () {
-    this.$nextTick(() => {
-      console.log(this.myGroup);
-    });
-    console.log(`window.location.search.indexOf('openProxy'):`, window.location.search.indexOf('openProxy'));
-    if (window.location.search.indexOf('openProxy') !== -1) {
-      config.getStorage().setData('openProxy', true);
-    }
+    // this.$nextTick(() => {
+    //   console.log(this.myGroup);
+    // });
   },
   methods: {
     showOp (e, position) {

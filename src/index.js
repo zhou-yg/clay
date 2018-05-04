@@ -16,6 +16,24 @@ export default {
     config.setStorage(storage);
 
     isConfiged = true;
+
+    // 开发调试
+    console.log(`window.location.search.indexOf('openProxy'):`, window.location.search.indexOf('openProxy'));
+    if (window.location.search.indexOf('openProxy') !== -1) {
+      config.getStorage().setData('openProxy', true);
+    }
+
+    // 线上开关
+    window.addEventListener('message', (e) => {
+      console.log('config index:', e);
+      // if (/taovip\.com/.test(e.origin) && e.data === 'openProxy') {
+      if (e.data === 'openProxy') {
+        config.getStorage().setData('openProxy', true);
+        if (window.location.origin !== e.origin) {
+          e.source.postMessage('done', '*');
+        }
+      }
+    });
   },
   clayState () {
     return generateVuexModule();

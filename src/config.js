@@ -75,7 +75,7 @@ function initVm (schema) {
           [key]: isArray(schema[key]) ? [] : {}
         };
       }), {
-        openProxy: true,
+        openProxy: false,
       });
     },
   });
