@@ -41,6 +41,9 @@ export default Cpt;
       <span class="input-box" v-if="g.type === 'boolean'" >
         <el-checkbox :value="g.value" size="small" @input="changeValue" />
       </span>
+      <span class="input-box" v-if="g.type === 'date'" >
+        <el-date-picker :value="g.value" size="small" @input="changeValue" />
+      </span>
     </p>
   </div>
 </template>

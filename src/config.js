@@ -9,12 +9,12 @@ var vmChangedCb = () => {};
 
 function schemaValidator (schema) {
   var r = true;
-  var validTypes = ['input', 'boolean'];
+  var validTypes = ['input', 'boolean', 'date'];
   Object.values(schema).forEach(obj => {
-    if (isArray(obj)){
-      obj = obj[0]
+    if (isArray(obj.perperties)){
+      obj = obj.perperties[0]
     }
-    let types = Object.values(obj);
+    let types = Object.values(obj.perperties);
     r = r && types.every(t => {
       return validTypes.indexOf(t) !== -1 || validTypes.indexOf(t.type) !== -1;
     });
@@ -53,7 +53,7 @@ function nomalizeSchema (schema) {
   }
 
   schema = reduceObj(Object.keys(schema).map(k => {
-    var v = schema[k]
+    var v = schema[k].perperties
     if (isPlainObject(v)) {
       v = fillNameAndType(v);
     } else if (isArray(v)) {
@@ -61,10 +61,16 @@ function nomalizeSchema (schema) {
     }
 
     return {
-      [k]: v,
+      [k]: Object.assign(schema[k], {
+        perperties: v,
+      }),
     };
   }))
   return schema;
+}
+
+function isShowKey (key) {
+  return `isShow${key[0].toUpperCase() + key.substr(1)}`;
 }
 
 function initVm (schema) {
@@ -72,7 +78,8 @@ function initVm (schema) {
     data () {
       return reduceObj(Object.keys(schema).map(key => {
         return {
-          [key]: isArray(schema[key]) ? [] : {}
+          [key]: isArray(schema[key].perperties) ? [] : {},
+          [isShowKey(key)]: (schema[key].isShow || function () { return true; }).bind(this),
         };
       }), {
         openProxy: false,
@@ -124,7 +131,19 @@ export default {
         vm[type] = vm[type].concat(newData);
       },
       getData (type) {
-        return vm[type];
+        const r = vm[type];
+        if (r === undefined) {
+          throw new Error(`${type} is not defined on Schema`);
+        }
+        if (type in schema) {
+          Object.defineProperty(r, 'isShow', {
+            enumerable: false,
+            value: vm[isShowKey(type)](),
+          });
+        }
+        console.log(isShowKey(type), r, r.isShow, vm[isShowKey(type)]);
+
+        return r || {};
       },
       save () {
         vmChangedCb(vm.$data);
@@ -133,7 +152,7 @@ export default {
   },
   setSchema (s) {
     if (!schemaValidator(s)) {
-      throw new Error('schema is invalid');
+      throw new Error('schema perperties has invalid "data type"');
     }
     schema = nomalizeSchema(s);
 
