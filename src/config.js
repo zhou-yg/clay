@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import {cloneDeep, isPlainObject, isArray} from 'lodash';
+import {cloneDeep, isPlainObject, isArray, pick} from 'lodash';
 import { reduceObj, typeDefaultValueMap } from './utils';
 var storage = null;
 var schema = null;
@@ -103,13 +103,29 @@ export default {
     if (!s.init || !s.save) {
       throw new Error('b');
     }
-    const initData = s.init();
-    vmChangedCb = s.save;
+    var initData = s.init();
+    function save(vmData) {
+
+      const dataKeys = Object.keys(schema);
+
+      const mySettingData = pick(vmData, dataKeys);
+
+      // console.log(`mySettingData:`, mySettingData);
+
+      Object.assign(initData, mySettingData);
+
+      s.save(vmData, initData);
+    };
+
+    vmChangedCb = save;
+
     vm = initVm(schema);
     if (initData instanceof Promise) {
       initData.then(data => {
         vm = initVmData (vm, data);
-      })
+        initData = data;
+        vmChangedCb = save;
+      });
     } else {
       vm = initVmData (vm, initData);
     }
@@ -135,15 +151,16 @@ export default {
         if (r === undefined) {
           throw new Error(`${type} is not defined on Schema`);
         }
+        const cloneR = cloneDeep(r);
         if (type in schema) {
-          Object.defineProperty(r, 'isShow', {
+          Object.defineProperty(cloneR, 'isShow', {
             enumerable: false,
             value: vm[isShowKey(type)](),
           });
         }
-        console.log(isShowKey(type), r, r.isShow, vm[isShowKey(type)]);
+        // console.log(isShowKey(type), r, r.isShow, vm[isShowKey(type)]);
 
-        return r || {};
+        return cloneR || {};
       },
       save () {
         vmChangedCb(vm.$data);
