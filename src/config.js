@@ -151,8 +151,8 @@ export default {
         if (r === undefined) {
           throw new Error(`${type} is not defined on Schema`);
         }
-        if (typeof r === 'object') {
-          const cloneR = cloneDeep(r);
+        const cloneR = cloneDeep(r);
+        if (typeof cloneR === 'object') {
           if (type in schema) {
             Object.defineProperty(cloneR, 'isShow', {
               enumerable: false,
