@@ -17,7 +17,6 @@
   },
   "homepage": "https://github.com/zhou-yg/clay#readme",
   "dependencies": {
-    "@qp/befunlib": "^0.2.2",
     "lodash": "^4.17.4"
   }
 }
