@@ -151,16 +151,18 @@ export default {
         if (r === undefined) {
           throw new Error(`${type} is not defined on Schema`);
         }
-        const cloneR = cloneDeep(r);
-        if (type in schema) {
-          Object.defineProperty(cloneR, 'isShow', {
-            enumerable: false,
-            value: vm[isShowKey(type)](),
-          });
+        if (typeof r === 'object') {
+          const cloneR = cloneDeep(r);
+          if (type in schema) {
+            Object.defineProperty(cloneR, 'isShow', {
+              enumerable: false,
+              value: vm[isShowKey(type)](),
+            });
+          }
         }
         // console.log(isShowKey(type), r, r.isShow, vm[isShowKey(type)]);
 
-        return cloneR || {};
+        return cloneR === undefined ? {} : cloneR;
       },
       save () {
         vmChangedCb(vm.$data);
