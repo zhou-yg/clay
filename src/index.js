@@ -29,9 +29,7 @@ export default {
       // if (/taovip\.com/.test(e.origin) && e.data === 'openProxy') {
       if (e.data === 'openProxy') {
         config.getStorage().setData('openProxy', true);
-        if (window.location.origin !== e.origin) {
-          e.source.postMessage('done', '*');
-        }
+        e.source.postMessage('done', '*');
       }
     });
   },
