@@ -38,27 +38,30 @@ const Cpt = Vue.extend({
       return config.getStorage().getData(this.type);
     },
     mySchemaProperties () {
+      console.log(config.getSchema(this.type));
       return config.getSchema(this.type).perperties;
     },
     myGroup () {
-      // console.log(`this.myData:`, this.myData);
-      // console.log(`this.mySchemaProperties:`, this.mySchemaProperties);
+      console.log(`this.myData:`, this.myData);
+      console.log(`this.mySchemaProperties:`, this.mySchemaProperties);
+      console.log(`this.mySchemaProperties[0]:`, this.mySchemaProperties[0]);
       if (Array.isArray(this.myData)) {
-        if (!Array.isArray(this.mySchemaProperties)) {
-          throw new Error(`${this.type} not match array`);
-        }
-
-        const keys = Object.keys(this.mySchemaProperties[0]);
+        // if (!Array.isArray(this.mySchemaProperties)) {
+        //   throw new Error(`${this.type} not match array`);
+        // }
+        const keys = Object.keys(this.mySchemaProperties);
         const myPickedData = this.myData.map(obj => pick(obj, keys));
 
-        let schemaArr = new Array(this.myData.length).fill(this.mySchemaProperties[0]).map(cloneDeep);
+        let schemaArr = new Array(this.myData.length).fill(this.mySchemaProperties).map(cloneDeep);
         let final = merge([], trans(myPickedData, 'value'), schemaArr);
         final = final.map(obj => Object.values(obj));
+        console.log(final);
         return final;
       } else {
         // console.log(`trans(this.myData, 'value')`, trans(this.myData, 'value'));
         let final = merge({}, trans(this.myData, 'value'), this.mySchemaProperties);
         let d = Object.values(final);
+        console.log(d);
         return d;
       }
     },
@@ -104,6 +107,33 @@ const Cpt = Vue.extend({
       });
       op.$on('newOne', () => {
         config.getStorage().newData(this.type);
+        // console.log(this.myGroup);
+        op.refreshGroupdata(this.myGroup);
+        // opManager.removeOp();
+        // this.$nextTick(() => {
+        //   this.showOp(null, position);
+        // })
+      });
+      op.$on('delOne', (i) => {
+        config.getStorage().delData(this.type, i);
+        // console.log(this.myGroup);
+        op.refreshGroupdata(this.myGroup);
+        // opManager.removeOp();
+        // this.$nextTick(() => {
+        //   this.showOp(null, position);
+        // })
+      });
+      op.$on('upOne', (i) => {
+        config.getStorage().upData(this.type, i);
+        // console.log(this.myGroup);
+        op.refreshGroupdata(this.myGroup);
+        // opManager.removeOp();
+        // this.$nextTick(() => {
+        //   this.showOp(null, position);
+        // })
+      });
+      op.$on('downOne', (i) => {
+        config.getStorage().downData(this.type, i);
         // console.log(this.myGroup);
         op.refreshGroupdata(this.myGroup);
         // opManager.removeOp();

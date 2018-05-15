@@ -52,7 +52,7 @@ const Cpt = Vue.extend({
         group[i].value = v;
       }
       this.myGroup = group;
-      this.$emit('change', this.myGroup);
+      this.$emit('change', group);
     },
     save () {
       this.$emit('save');
@@ -63,6 +63,27 @@ const Cpt = Vue.extend({
     newOne () {
       this.$emit('newOne');
     },
+    delOne (i, group) {
+      if (group.length <= 1) {
+        this.$message.error('配置项至少存在一个');
+        return;
+      }
+      this.$emit('delOne', i);
+    },
+    upOne (i, group) {
+      if (i === 0) {
+        this.$message.error('已在最顶部');
+        return;
+      }
+      this.$emit('upOne', i);
+    },
+    downOne (i, group) {
+      if (i === group.length - 1 ) {
+        this.$message.error('已在最底部');
+        return;
+      }
+      this.$emit('downOne', i);
+    }
   },
   components: {
     OperationItem,
@@ -80,8 +101,13 @@ export default Cpt;
         <h3>{{title}}</h3>
       </header>
       <div class="item" v-for="(g, index) in myGroup" :key="g.name" :data-index="index" >
+          <div class="del" v-if="isArr">
+            <i @click="delOne(index, myGroup)" class="el-icon-circle-close"></i>
+            <i @click="upOne(index, myGroup)" class="icon-xiangshang"></i>
+            <i @click="downOne(index, myGroup)" class="icon-xiangxia"></i>
+          </div>
           <p v-if="isArr" >
-            <span v-for="(g1, index2) in g">
+            <span v-for="(g1, index2) in g.sort()">
               <operation-item :key="g.value + String(index2)" :g="g1" @change="v => changeValue(v, index, index2)" />
             </span>
           </p>
@@ -139,9 +165,20 @@ export default Cpt;
   }
 
   .item {
+    position: relative;
     margin: 0 0 8px 0;
     padding-bottom: 5px;
     border-bottom: 1px solid #eee;
+    .del {
+      position: absolute;
+      right: 0;
+      top: 0;
+      cursor: pointer;
+      i {
+        font-size: 24px;
+        vertical-align: middle;
+      }
+    }
   }
 
   &.right {

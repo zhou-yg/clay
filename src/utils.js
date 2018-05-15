@@ -35,6 +35,9 @@ export function typeDefaultValueMap (t) {
     input: '',
     date: '',
     boolean: false,
+    img: '',
+    checkbox: [],
+    radio: '',
   };
   const v = m[t]
   return v === undefined ? null : v;

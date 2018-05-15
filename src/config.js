@@ -9,10 +9,10 @@ var vmChangedCb = () => {};
 
 function schemaValidator (schema) {
   var r = true;
-  var validTypes = ['input', 'boolean', 'date'];
+  var validTypes = ['input', 'boolean', 'date', 'img', 'checkbox', 'radio', 'switch'];
   Object.values(schema).forEach(obj => {
     if (isArray(obj.perperties)){
-      obj = obj.perperties[0]
+      obj.perperties = obj.perperties[0]
     }
     let types = Object.values(obj.perperties);
     r = r && types.every(t => {
@@ -136,7 +136,7 @@ export default {
         vm[type] = v;
       },
       newData (type) {
-        const dataTemp = cloneDeep(schema[type][0]);
+        const dataTemp = cloneDeep(schema[type].perperties);
 
         const newData = reduceObj(Object.values(dataTemp).map(vObj => {
           return {
@@ -145,6 +145,23 @@ export default {
         }));
 
         vm[type] = vm[type].concat(newData);
+      },
+      delData (type, i) {
+        vm[type].splice(i, 1);
+      },
+      upData (type, i) {
+        let newData = cloneDeep(vm[type]);
+        let pre = cloneDeep(newData[i - 1]);
+        newData[i - 1] = cloneDeep(newData[i]);
+        newData[i] = pre;
+        vm[type] = newData;
+      },
+      downData (type, i) {
+        let newData = cloneDeep(vm[type]);
+        let pre = cloneDeep(newData[i]);
+        newData[i] = cloneDeep(newData[i + 1]);
+        newData[i + 1] = pre;
+        vm[type] = newData;
       },
       getData (type) {
         const r = vm[type];
