@@ -52,7 +52,7 @@ const Cpt = Vue.extend({
         group[i].value = v;
       }
       this.myGroup = group;
-      this.$emit('change', group);
+      this.$emit('change', this.myGroup);
     },
     save () {
       this.$emit('save');
@@ -107,7 +107,7 @@ export default Cpt;
             <i @click="downOne(index, myGroup)" class="icon-xiangxia"></i>
           </div>
           <p v-if="isArr" >
-            <span v-for="(g1, index2) in g.sort()">
+            <span v-for="(g1, index2) in g">
               <operation-item :key="g.value + String(index2)" :g="g1" @change="v => changeValue(v, index, index2)" />
             </span>
           </p>

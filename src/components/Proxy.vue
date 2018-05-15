@@ -168,12 +168,12 @@ export default Cpt;
  .clay-proxy {
    box-sizing: border-box;
    width: 100%;
-   display: inline-block;
    position: relative;
 
    &.open {
-     border:1px dotted;
-     min-height: 16px;
+    border:1px dotted;
+    min-height: 16px;
+    display: inline-block;
    }
 
    .tag {

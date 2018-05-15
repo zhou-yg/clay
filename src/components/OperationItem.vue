@@ -59,14 +59,14 @@ export default Cpt;
       </span>
       <span class="input-box" style="vertical-align: text-top;width: auto" v-if="g.type === 'radio'" >
         <el-radio-group
-          :value="g.value"
+          v-model="g.value"
           @change="changeValue">
           <el-radio v-for="item in g.labels" :label="item.label">{{item.name}}</el-radio>
         </el-radio-group>
       </span>
-      <span class="input-box" style="vertical-align: text-top;width: auto" v-if="g.type === 'radio'" >
+      <span class="input-box" style="vertical-align: text-top;width: auto" v-if="g.type === 'switch'" >
         <el-switch
-          :value="g.value"
+          v-model="g.value"
           @change="changeValue"
           active-color="#01a6ff"
           inactive-color="#efefef">
