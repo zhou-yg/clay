@@ -24,22 +24,36 @@ const opManager = {
 const Cpt = Vue.extend({
   // mixins: [props2DataMixin('data', 'myData')],
   props: {
-    type: String,
+    type: [String, Array],
   },
   data () {
-    return {};
+    return {
+      index: 0,
+    };
   },
   computed: {
+    currentType () {
+      if (this.type instanceof Array) {
+        return this.type[this.index];
+      }
+      return this.type;
+    },
+    typeArray () {
+      if (this.type instanceof Array) {
+        return this.type;
+      }
+      return [this.type];
+    },
     openProxy () {
       console.log(`config.getStorage().getData('openProxy'):`, config.getStorage().getData('openProxy'));
       return config.getStorage().getData('openProxy');
     },
     myData () {
-      return config.getStorage().getData(this.type);
+      return config.getStorage().getData(this.currentType);
     },
     mySchemaProperties () {
-      console.log(config.getSchema(this.type));
-      return config.getSchema(this.type).perperties;
+      console.log(config.getSchema(this.currentType));
+      return config.getSchema(this.currentType).perperties;
     },
     myGroup () {
       console.log(`this.myData:`, this.myData);
@@ -87,7 +101,8 @@ const Cpt = Vue.extend({
       const op = new Operation({
         el: document.createElement('div'),
         propsData: {
-          title: this.type,
+          title: this.currentType,
+          types: this.typeArray,
           group: this.myGroup,
           position,
         }
@@ -99,14 +114,14 @@ const Cpt = Vue.extend({
         } else {
           typeValue = groupToValue(group);
         }
-        config.getStorage().setData(this.type, typeValue);
+        config.getStorage().setData(this.currentType, typeValue);
       });
       op.$on('save', () => {
         config.getStorage().save();
         opManager.removeOp();
       });
       op.$on('newOne', () => {
-        config.getStorage().newData(this.type);
+        config.getStorage().newData(this.currentType);
         // console.log(this.myGroup);
         op.refreshGroupdata(this.myGroup);
         // opManager.removeOp();
@@ -115,7 +130,7 @@ const Cpt = Vue.extend({
         // })
       });
       op.$on('delOne', (i) => {
-        config.getStorage().delData(this.type, i);
+        config.getStorage().delData(this.currentType, i);
         // console.log(this.myGroup);
         op.refreshGroupdata(this.myGroup);
         // opManager.removeOp();
@@ -124,7 +139,7 @@ const Cpt = Vue.extend({
         // })
       });
       op.$on('upOne', (i) => {
-        config.getStorage().upData(this.type, i);
+        config.getStorage().upData(this.currentType, i);
         // console.log(this.myGroup);
         op.refreshGroupdata(this.myGroup);
         // opManager.removeOp();
@@ -133,7 +148,7 @@ const Cpt = Vue.extend({
         // })
       });
       op.$on('downOne', (i) => {
-        config.getStorage().downData(this.type, i);
+        config.getStorage().downData(this.currentType, i);
         // console.log(this.myGroup);
         op.refreshGroupdata(this.myGroup);
         // opManager.removeOp();
@@ -143,6 +158,12 @@ const Cpt = Vue.extend({
       });
       op.$on('cancel', () => {
         opManager.removeOp();
+      });
+      op.$on('changeType', (newIndex) => {
+        this.index = newIndex;
+        this.$nextTick(() => {
+          this.showOp(null, position);
+        })
       });
       window.pEl = this.$el;
       document.body.appendChild(op.$el);

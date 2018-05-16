@@ -11,6 +11,7 @@ const Cpt = Vue.extend({
   mixins: [props2DataMixin('group', 'myGroup')],
   props: {
     title: String,
+    types: [String, Array],
     group: Array,
     position: Object,
   },
@@ -37,6 +38,11 @@ const Cpt = Vue.extend({
     });
   },
   methods: {
+    handleClick (vm) {
+      console.log(vm);
+      this.$emit('changeType', vm.index);
+      return;
+    },
     refreshGroupdata (newGroupData) {
       this.myGroup = cloneDeep(newGroupData);
       this.$nextTick(() => {
@@ -98,7 +104,10 @@ export default Cpt;
     <div class="clay-operation-box-bg" @click="cancel"></div>
     <div ref="co" class="clay-operation" :class="positionDirection" >
       <header>
-        <h3>{{title}}</h3>
+        <el-tabs :value="title" @tab-click="handleClick">
+          <el-tab-pane v-for="tab in types" :label="tab" :name="tab" :key="tab"></el-tab-pane>
+        </el-tabs>
+        <!-- <h3>{{title}}</h3> -->
       </header>
       <div class="item" v-for="(g, index) in myGroup" :key="g.name" :data-index="index" >
           <div class="del" v-if="isArr">
