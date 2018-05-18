@@ -45,7 +45,7 @@ const Cpt = Vue.extend({
       return [this.type];
     },
     openProxy () {
-      console.log(`config.getStorage().getData('openProxy'):`, config.getStorage().getData('openProxy'));
+      // console.log(`config.getStorage().getData('openProxy'):`, config.getStorage().getData('openProxy'));
       return config.getStorage().getData('openProxy');
     },
     myData () {
@@ -53,7 +53,7 @@ const Cpt = Vue.extend({
     },
     mySchemaProperties () {
       console.log(config.getSchema(this.currentType));
-      return config.getSchema(this.currentType).perperties;
+      return config.getSchema(this.currentType).properties;
     },
     myGroup () {
       console.log(`this.myData:`, this.myData);

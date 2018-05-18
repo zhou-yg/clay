@@ -7,14 +7,41 @@ var vm;
 
 var vmChangedCb = () => {};
 
+const validTypes = ['input', 'boolean', 'date', 'img', 'checkbox', 'radio', 'switch'];
+
+function defualtValueByType (type) {
+  const m = {
+    'boolean': false,
+    'switch': false,
+    'checkbox': [],
+  }
+  return typeof m[type] ===  'undefined' ? '' : m[type];
+}
+
+function getScehmeDefault (schemeConfigOne) {
+  console.log(`schemeConfigOne.properties:`, schemeConfigOne, schemeConfigOne.properties);
+  const properties = cloneDeep(schemeConfigOne.properties);
+
+  if (Array.isArray(properties)) {
+    return [];
+  } else {
+    return reduceObj(Object.keys(properties).map(propName => {
+      const t = properties[propName].type;
+      return {
+        [propName]: defualtValueByType(t),
+      };
+    }));
+  }
+}
+
 function schemaValidator (schema) {
   var r = true;
-  var validTypes = ['input', 'boolean', 'date', 'img', 'checkbox', 'radio', 'switch'];
   Object.values(schema).forEach(obj => {
-    if (isArray(obj.perperties)){
-      obj.perperties = obj.perperties[0]
+    if (isArray(obj.properties)){
+      obj.properties = obj.properties[0]
     }
-    let types = Object.values(obj.perperties);
+    console.log(`obj.properties:`, obj.properties);
+    let types = Object.values(obj.properties);
     r = r && types.every(t => {
       return validTypes.indexOf(t) !== -1 || validTypes.indexOf(t.type) !== -1;
     });
@@ -26,8 +53,12 @@ function schemaValidator (schema) {
 {
   [数据字段]: {
     key, // 字段名
-    type, // 数据类型 input, boolean,
-    name, // 名称
+    properties: {
+      objKey: {
+        type, // 数据类型 input, boolean,
+        name, // 名称
+      }
+    }
  }
 }
 */
@@ -53,7 +84,7 @@ function nomalizeSchema (schema) {
   }
 
   schema = reduceObj(Object.keys(schema).map(k => {
-    var v = schema[k].perperties
+    var v = schema[k].properties
     if (isPlainObject(v)) {
       v = fillNameAndType(v);
     } else if (isArray(v)) {
@@ -62,7 +93,7 @@ function nomalizeSchema (schema) {
 
     return {
       [k]: Object.assign(schema[k], {
-        perperties: v,
+        properties: v,
       }),
     };
   }))
@@ -78,7 +109,7 @@ function initVm (schema) {
     data () {
       return reduceObj(Object.keys(schema).map(key => {
         return {
-          [key]: isArray(schema[key].perperties) ? [] : {},
+          [key]: isArray(schema[key].properties) ? [] : {},
           [isShowKey(key)]: (schema[key].isShow || function () { return true; }).bind(this),
         };
       }), {
@@ -88,10 +119,22 @@ function initVm (schema) {
   });
   return vm;
 }
-function initVmData (vm, data) {
-  Object.keys(data).forEach(k => {
-    vm[k] = data[k];
+function initVmData (vm, data, mySchema) {
+  const schemaKeys = Object.keys(mySchema);
+
+  schemaKeys.forEach(k => {
+    let v = data[k];
+    if (typeof v === 'undefined') {
+      console.log('schema key,', k);
+      v = getScehmeDefault(mySchema[k]);
+    }
+    vm[k] = v;
   });
+  //
+  // Object.keys(data).forEach(k => {
+  //   vm[k] = data[k];
+  // });
+  console.log(`initVmData:`, vm);
   return vm;
 }
 
@@ -122,12 +165,12 @@ export default {
     vm = initVm(schema);
     if (initData instanceof Promise) {
       initData.then(data => {
-        vm = initVmData (vm, data);
+        vm = initVmData (vm, data, schema);
         initData = data;
         vmChangedCb = save;
       });
     } else {
-      vm = initVmData (vm, initData);
+      vm = initVmData (vm, initData, schema);
     }
   },
   getStorage () {
@@ -136,7 +179,7 @@ export default {
         vm[type] = v;
       },
       newData (type) {
-        const dataTemp = cloneDeep(schema[type].perperties);
+        const dataTemp = cloneDeep(schema[type].properties);
 
         const newData = reduceObj(Object.values(dataTemp).map(vObj => {
           return {
@@ -188,7 +231,7 @@ export default {
   },
   setSchema (s) {
     if (!schemaValidator(s)) {
-      throw new Error('schema perperties has invalid "data type"');
+      throw new Error('schema properties has invalid "data type"');
     }
     schema = nomalizeSchema(s);
 
