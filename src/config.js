@@ -165,11 +165,12 @@ export default {
     vm = initVm(schema);
     if (initData instanceof Promise) {
       initData.then(data => {
-        vm = initVmData (vm, data, schema);
-        initData = data;
+        initData = cloneDeep(data);
+        vm = initVmData (vm, initData, schema);
         vmChangedCb = save;
       });
     } else {
+      initData = cloneDeep(initData);
       vm = initVmData (vm, initData, schema);
     }
   },
